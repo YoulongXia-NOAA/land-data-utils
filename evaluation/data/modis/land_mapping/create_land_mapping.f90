@@ -3,10 +3,9 @@ program create_land_mapping
 use netcdf
 implicit none
 
-character*256 :: modis_regrid_filename = '/scratch2/NCEPDEV/land/data/evaluation/MODIS/albedo/index_files/MODIS0.05_to_FV3_mapping.C96_oro_data.nc'
-!character*256 :: land_static_filename = '/scratch2/NCEPDEV/land/data/forcing/era5/static/ufs-land_C96_static_fields.nc'
-character*256 :: land_static_filename = '/scratch2/NCEPDEV/land/Michael.Barlage/forcing/C96/vector/ufs-land_C96_conus_static_fields_hr2.nc'
-character*256 :: output_filename = '/scratch2/NCEPDEV/land/data/evaluation/MODIS/albedo/land_mapping_files/MODIS0.05_to_land_mapping.C96_conus_hr2.nc'
+character*256 :: modis_regrid_filename
+character*256 :: land_static_filename 
+character*256 :: output_filename
 
 integer, allocatable :: data_tile      (:,:)
 integer, allocatable :: data_tile_i    (:,:)
@@ -17,8 +16,26 @@ integer, allocatable :: model_tile_j   (:)
 integer, allocatable :: modis_location (:,:)
 
 integer :: error, ncid, dimid, varid, dimid_modis_i, dimid_modis_j, modis_i, modis_j, location
-integer :: nlocations, idim_modis_length, jdim_modis_length
-logical :: found
+integer :: nlocations, idim_modis_length, jdim_modis_length, io, ierr
+logical :: found, file_exists
+
+namelist/land_mapping_nml/ modis_regrid_filename, land_static_filename, output_filename
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Setup inputs and read namelist
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! read namelist
+ inquire(file='land_mapping.nml', exist=file_exists)
+
+if (.not. file_exists) then
+        print *, 'namelistfile does not exist, exiting'
+        stop 10
+endif
+
+open (action='read', file='land_mapping.nml', iostat=ierr, newunit=io)
+read (nml=land_mapping_nml, iostat=ierr, unit=io)
+close (io)
 
 !====================================
 ! read land static file
