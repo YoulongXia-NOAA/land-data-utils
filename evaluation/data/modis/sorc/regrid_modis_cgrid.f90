@@ -4,13 +4,16 @@ use netcdf
 
 implicit none
 
-character*256 :: modis_regrid_filename = '/scratch2/NCEPDEV/land/data/evaluation/MODIS/albedo/land_mapping_files/MODIS0.05_to_land_mapping.C96.nc'
-character*256 :: land_static_filename = '/scratch2/NCEPDEV/land/data/forcing/era5/static/ufs-land_C96_static_fields.nc'
-character*256 :: modis_land_filename = '/scratch2/NCEPDEV/land/data/evaluation/MODIS/landcover/MCD12C1.A2021001.061.nc'
+character*256 :: modis_filepath
+character*256 :: regrid_outpath
+character*256 :: modis_regrid_filename
+character*256 :: land_static_filename
+character*256 :: modis_land_filename
 character*256 :: modis_filename 
 character*256 :: output_filename 
 
 character*7   :: datestring
+character*10  :: fv3_grid
 double precision  :: sec_since
 integer           :: offset_ss
 integer           :: dim_time, id_time, id_lat, id_lon
@@ -44,12 +47,28 @@ real     , allocatable :: longitude(:)
 integer*2, allocatable :: percent_good_data  (:)
 integer*2, allocatable :: data_regrid        (:)
 
-integer :: error, ncid, dimid, varid(8)
+integer :: error, ncid, dimid, varid(8), io, ierr
 integer :: nlocations, idim_modis_length, jdim_modis_length
 integer*2, parameter ::  nodata_int = -32767
 
-!call getarg(1,datestring)
+logical :: file_exists
 
+namelist/modis_regrid_nml/ fv3_grid, land_static_filename, modis_land_filename, modis_regrid_filename, modis_filepath, regrid_outpath
+
+! read namelist
+
+inquire(file='modis_regrid.nml', exist=file_exists)
+
+if (.not. file_exists) then
+    print *, 'namelistfile does not exist, exiting'
+    stop 10
+endif
+
+open (action='read', file='modis_regrid.nml', iostat=ierr, newunit=io)
+read (nml=modis_regrid_nml, iostat=ierr, unit=io)
+close (io)
+
+! ====================================================
 open(18, file='date_input.txt', status='old')
 read(18,'(A7)') datestring
 read(18,'(A8)') daystring
@@ -64,6 +83,7 @@ call calc_sec_since(since_date, current_date, offset_ss, sec_since)
 
 !====================================
 ! read land static file
+!write(6,*) trim(land_static_filename)
 
 error = nf90_open(trim(land_static_filename), NF90_NOWRITE, ncid)
   call netcdf_err(error, 'opening file: '//trim(land_static_filename) )
@@ -98,6 +118,7 @@ error = nf90_close(ncid)
 
 !====================================
 ! read mapping file
+!write(6,*) trim(modis_regrid_filename)
 
 error = nf90_open(trim(modis_regrid_filename),nf90_nowrite, ncid)
   call netcdf_err(error, 'opening file: '//trim(modis_regrid_filename) )
@@ -127,6 +148,7 @@ error = nf90_close(ncid)
 
 !====================================
 ! read land cover file
+!write(6,*) trim(modis_land_filename)
 
 error = nf90_open(trim(modis_land_filename),nf90_nowrite, ncid)
   call netcdf_err(error, 'opening file: '//trim(modis_land_filename) )
@@ -170,7 +192,8 @@ allocate(modis_wsa_sw(idim_modis_length,jdim_modis_length))
 allocate(modis_wsa_nir(idim_modis_length,jdim_modis_length))
 allocate(modis_wsa_vis(idim_modis_length,jdim_modis_length))
 
-modis_filename = '/scratch2/NCEPDEV/land/data/evaluation/MODIS/albedo/orig/MCD43C3.A'//trim(datestring)//'.061.nc'
+modis_filename = trim(modis_filepath)//'/MCD43C3.A'//trim(datestring)//'.061.nc'
+!write(6,*) trim(modis_filename)
 
 error = nf90_open(trim(modis_filename),nf90_nowrite, ncid)
   call netcdf_err(error, 'opening file: '//trim(modis_filename) )
@@ -236,7 +259,7 @@ allocate(percent_good_data(nlocations))
 !====================================
 ! write remapped albedo
 
-output_filename = '/scratch2/NCEPDEV/land/data/evaluation/MODIS/albedo/C96/MCD43C3.A'//trim(daystring)//'.061.C96.nc'
+output_filename = trim(regrid_outpath)//'/'//trim(fv3_grid)//'/MCD43C3.A'//trim(daystring)//'.061.'//trim(fv3_grid)//'.nc'
 
 error = nf90_create(output_filename, ior(nf90_netcdf4,nf90_classic_model), ncid)
  call netcdf_err(error, 'creating file='//trim(output_filename) )
