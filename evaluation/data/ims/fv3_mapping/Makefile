@@ -6,8 +6,8 @@
  COMPILERF90    =       ifort
  FREESOURCE     =       #-ffree-form  -ffree-line-length-none
  F90FLAGS       =       -r8 -mcmodel=large
- NETCDFMOD      =       -I/apps/netcdf/4.7.0/intel/18.0.5.274/include
- NETCDFLIB      =       -L/apps/netcdf/4.7.0/intel/18.0.5.274/lib -lnetcdf -lnetcdff
+ NETCDFMOD      =       -I${NETCDF}/include
+ NETCDFLIB      =       -L${NETCDF}/lib -lnetcdf -lnetcdff
 
 OBJS =	create_fv3_mapping.o
 

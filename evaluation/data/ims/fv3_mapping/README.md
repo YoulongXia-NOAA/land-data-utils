@@ -1,20 +1,15 @@
 (1) Code to create file with indexes used to map from ASCII IMS file onto FV3 grid. 
 
-Must be run for each FV3 resolution  - need to change resolution (2 places) in create_fv3_mapping.f90. 
-
-Input (hard-coded into create_fv3_mapping.f90): 
--ASCII IMS example input file
--IMS lat lon files (created by Youlong). Note that the converted data has changed lat from its original
-north-south to south-north. Such a change leads to a consistentency with the original ims ascii
-file (south-north).
--FV3 grid tiles. 
-
 To compile on hera, use build.sh. 
 
 requires following modules: 
 
-module load intel
+module use /scratch1/NCEPDEV/nems/role.epic/spack-stack/spack-stack-1.6.0/envs/unified-env-rocky8/install/modulefiles/Core
+
+module load stack-intel/2021.5.0
+module load stack-intel-oneapi-mpi/2021.5.1
 module load netcdf/4.7.0
+module load netcdf-hdf5parallel/4.7.4
 
 To run, submit executable (in big-mem queue)
 

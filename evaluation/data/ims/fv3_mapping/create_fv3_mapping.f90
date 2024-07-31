@@ -3,7 +3,6 @@ program create_fv3_mapping
   use netcdf
   implicit none
 
-! namelist vars 
   integer            :: tile_dim 
   character*100      :: tile_path 
   character*100      :: orog_path

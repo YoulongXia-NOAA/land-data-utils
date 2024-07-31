@@ -10,6 +10,7 @@
 #SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
 
+module load ncl
 
 ncl create_pt_ims1km_mapping_prototype.ncl
 

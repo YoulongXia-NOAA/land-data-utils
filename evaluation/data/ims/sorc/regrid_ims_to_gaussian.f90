@@ -1,4 +1,4 @@
-program regrid_ims_cgrid
+program regrid_ims_gaussian
 
 use netcdf
 
