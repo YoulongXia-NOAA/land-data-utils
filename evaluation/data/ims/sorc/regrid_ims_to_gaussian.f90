@@ -257,19 +257,19 @@ error = nf90_put_att(ncid, id_time, "units", "seconds since "//since_date)
   call netcdf_err(error, 'defining time units' )
 
 !--- define longitude
-error = nf90_def_var(ncid, "lon", NF90_FLOAT, (/dim_id_i/), varid)
+error = nf90_def_var(ncid, "lon", NF90_FLOAT, (/dim_id_i/), id_lon)
   call netcdf_err(error, 'defining lon' )
-error = nf90_put_att(ncid, varid, "long_name", "longitude")
+error = nf90_put_att(ncid, id_lon, "long_name", "longitude")
   call netcdf_err(error, 'defining lon long name' )
-error =  nf90_put_att(ncid, varid, "unit", "degrees_east")
+error =  nf90_put_att(ncid, id_lon, "unit", "degrees_east")
   call netcdf_err(error, 'defining lon units' )  
 
 !--- define latitude
-error = nf90_def_var(ncid, "lat", NF90_FLOAT, (/dim_id_j/), varid)
+error = nf90_def_var(ncid, "lat", NF90_FLOAT, (/dim_id_j/), id_lat)
   call netcdf_err(error, 'defining lat' )
-error = nf90_put_att(ncid,  varid, "long_name", "latitude")
+error = nf90_put_att(ncid,  id_lat, "long_name", "latitude")
   call netcdf_err(error, 'defining lat long name' )
-error = nf90_put_att(ncid, varid, "units", "degrees_north")
+error = nf90_put_att(ncid, id_lat, "units", "degrees_north")
    call netcdf_err(error, 'defining lat units' )
 
 !======================================
@@ -294,10 +294,10 @@ error = nf90_enddef(ncid)
 error = nf90_put_var(ncid, id_time, sec_since)
     call netcdf_err(error, 'writing time record')
 
-error =  nf90_put_var(ncid, varid, longitude, start = (/1/), count = (/destination_lons/))
+error =  nf90_put_var(ncid, id_lon, longitude, start = (/1/), count = (/destination_lons/))
     call netcdf_err(error, 'writing lon record')
 
-error =  nf90_put_var(ncid, varid, latitude, start = (/1/), count = (/destination_lats/))
+error =  nf90_put_var(ncid, id_lat, latitude, start = (/1/), count = (/destination_lats/))
 
   call netcdf_err(error, 'writing lat record')
 
