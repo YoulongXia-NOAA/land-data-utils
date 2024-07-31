@@ -183,7 +183,7 @@ program data_regrid_gaussian
 
   where(ycb < 0.0) cmcSnowDepth=-9999.0
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Convert 1D vector into 2D array for soil moisture and error
+! Convert 1D vector into 2D array for cmc snow depth
 ! Keep lats and lons as 1D to save storage space 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   itotal=0

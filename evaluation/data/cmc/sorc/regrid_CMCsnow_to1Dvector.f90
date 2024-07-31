@@ -21,7 +21,6 @@ program data_regrid
 
   integer, parameter           :: source_lats           = 706
   integer, parameter           :: source_lons           = 706
-!!!!!!!!!!!!!! C384 grid points !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   integer :: destination_locs, weight_locs
   integer :: latloc, lonloc, iwt, ndays
   integer :: i, j, itotal, id, iyear, im, io, ierr
@@ -149,6 +148,8 @@ program data_regrid
 ! Regrid the data
   cmcSnowDepth = 0.0
   cmcSnowDepthWT = 0.0
+
+!!!! if source_input values exist, do regrid work !!!
 
   do iwt = 1, weight_locs
 
