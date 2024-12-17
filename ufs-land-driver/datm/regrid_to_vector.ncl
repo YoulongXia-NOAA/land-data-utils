@@ -38,26 +38,29 @@ numlocs = dimsizes(infile->frac_b)
 do iyyyy = yyyy_beg, yyyy_end
 do imm = mm_beg, mm_end
 
-  numdays = days_in_month(iyyyy,imm)
+  datestring = ""+iyyyy+tostring_with_format(imm,"%2.2d")
+  datestringOut = ""+iyyyy+"-"+tostring_with_format(imm,"%2.2d")
 
-do idd = 1, numdays
-  
-  time_start = cd_inv_calendar(iyyyy,imm,idd,0,0,0,"seconds since 1970-01-01 00:00:00", 0)
-
-  time = new(24, double)
-    time@units = "seconds since 1970-01-01 00:00:00"
-    time!0 = "time"
-
-  do ihh = 0, 23
-    time(ihh) = time_start + ihh * todouble(3600.0)
-  end do
-
-  datestring = ""+iyyyy+"-"+tostring_with_format(imm,"%2.2d")+"-"+tostring_with_format(idd,"%2.2d")
-
-  infile = addfile(datm_source_path+"ERA5_forcing_"+datestring+".nc","r")
+  infile = addfile(datm_source_path+"replay_forcing_"+datestring+".nc","r")
   print("Starting: "+datestring)
 
-  solar_radiation = new((/24,numlocs/), float)
+; define total number for a given month 3 hourly data
+  numdays = days_in_month(iyyyy,imm)
+  tnum = numdays * 8  
+
+  idd = 1
+  time_start = cd_inv_calendar(iyyyy,imm,idd,0,0,0,"seconds since 1970-01-01 00:00:00", 0)
+
+  time = new(tnum, double)
+  time@units = "seconds since 1970-01-01 00:00:00"
+  time!0 = "time"
+
+  do ihh = 0, tnum-1
+    ihh1 = 3 * ihh
+    time(ihh) = time_start + ihh1 * todouble(3600.0)
+  end do
+
+  solar_radiation = new((/tnum,numlocs/), float)
     solar_radiation@units = "W/m2"
     solar_radiation!0 = "time"
     solar_radiation!1 = "location"
@@ -77,7 +80,7 @@ do idd = 1, numdays
   
 ;;;;;;;;;;;;;;;;;;;;
 
-  data = infile->downward_solar
+  data = infile->dswrf_ave
 
   var_regrid = ESMF_regrid_with_weights(data,weights_filename,Opt)
   
@@ -85,7 +88,7 @@ do idd = 1, numdays
   
 ;;;;;;;;;;;;;;;;;;;;
 
-  data = infile->downward_longwave
+  data = infile->dlwrf_ave
 
   var_regrid = ESMF_regrid_with_weights(data,weights_filename,Opt)
   
@@ -93,12 +96,12 @@ do idd = 1, numdays
 
 ;;;;;;;;;;;;;;;;;;;;
 
-  data = infile->temperature
+  data = infile->tmp2m
 
   var_regrid = ESMF_regrid_with_weights(data,weights_filename,Opt)
 
   if(do_elevation_adjustment) then
-    do itime = 0, 23
+    do itime = 0, tnum-1
       var_regrid(itime,:) = var_regrid(itime,:) + elevation_difference * 0.0065
     end do
   end if
@@ -106,16 +109,20 @@ do idd = 1, numdays
   temperature = (/ var_regrid /)
 
 ;;;;;;;;;;;;;;;;;;;;
+; reverse latitude to conform with south to north direction
 
-  data = infile->specific_humidity
+  data = infile->spfh2m
 
   var_regrid = ESMF_regrid_with_weights(data,weights_filename,Opt)
   
   specific_humidity = (/ var_regrid /)
 
 ;;;;;;;;;;;;;;;;;;;;
+  u10m = infile->ugrd10m
 
-  data = infile->wind_speed
+  v10m = infile->vgrd10m
+
+  data = wind_speed(u10m,v10m)
 
   var_regrid = ESMF_regrid_with_weights(data,weights_filename,Opt)
   
@@ -123,7 +130,7 @@ do idd = 1, numdays
 
 ;;;;;;;;;;;;;;;;;;;;
 
-  data = infile->surface_pressure
+  data = infile->pressfc
 
   var_regrid = ESMF_regrid_with_weights(data,weights_filename,Opt)
   
@@ -131,7 +138,7 @@ do idd = 1, numdays
 
 ;;;;;;;;;;;;;;;;;;;;
 
-  data = infile->precipitation
+  data = infile->prateb_ave
 
   var_regrid = ESMF_regrid_with_weights(data,weights_filename,Opt)
   
@@ -139,7 +146,7 @@ do idd = 1, numdays
   
 ;;;;;;;;;;;;;;;;;;;;
 
-  outname = output_preamble+"_datm_"+datestring+".nc"
+  outname = output_preamble+"_datm_"+datestringOut+".nc"
    system("if [ -e "+outname+" ]; then rm -f "+outname+ ";fi")
   outfile = addfile(outname,"c")
   outfile->solar_radiation = solar_radiation
@@ -162,8 +169,9 @@ do idd = 1, numdays
   delete(speed)
   delete(surface_pressure)
   delete(precipitation)
+  delete(u10m)
+  delete(v10m)
 
-end do
 end do
 end do
 
