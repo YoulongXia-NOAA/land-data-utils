@@ -3,11 +3,11 @@
 export scripts=/scratch2/NCEPDEV/land/data/evaluation/ush
 export EXEC_DIR=../sorc
 
-#sdate=20131001
-#edate=20211231
+#sdate=20220101
+#edate=20231231
 
-sdate=20131001
-edate=20131001
+#sdate=20131001
+#edate=20131001
 
 while [ $sdate -le $edate ]; do
    year=`echo $sdate |cut -c1-4`
