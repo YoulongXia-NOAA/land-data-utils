@@ -13,7 +13,7 @@
 #SBATCH --chdir=.
 #
 # -- Request tasks, this should correspond to the number of lines in your regrid-tasks file
-#SBATCH --ntasks=4
+#SBATCH --ntasks=2
 #
 #SBATCH --mem=50G
 #
@@ -34,7 +34,7 @@ ocn_res="mx025"
 grid_version="hr3"
 grid_extent="global"
 datm_source="SNOW2DVAR"
-datm_source_path="/scratch2/NCEPDEV/stmp3/Youlong.Xia/forcing/snow2dvar/orig/"
+datm_source_path="/scratch2/NCEPDEV/land/data/ufs-land-driver/datm/SNOW2DVAR/orig/"
 elevation_source_filename="/scratch2/NCEPDEV/stmp3/Youlong.Xia/forcing/snow2dvar/elevation/c384_mx025_orog_2davr.nc"
 static_file_path="/scratch2/NCEPDEV/land/data/ufs-land-driver/vector_inputs/"
 weights_path="../weights/"
@@ -124,6 +124,6 @@ echo "output_preamble = "$output_path$datm_source"-"$grid >> regrid_parameter_as
 
 srun -l --multi-prog $regrid_tasks_file
 
-#rm -f $elevation_filename
-#rm -f regrid_parameter_assignment
+rm -f $elevation_filename
+rm -f regrid_parameter_assignment
 
