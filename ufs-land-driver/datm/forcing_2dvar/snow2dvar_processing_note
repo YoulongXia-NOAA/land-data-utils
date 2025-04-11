@@ -1,0 +1,27 @@
+The forcing data use 3-hour and 6-hour fcst for 2m air temperature, 2m spefic humidity, downward shortwave radiation, downward longwave radiation, 10m u wind, 10m v wind, surface precipitation and 6-hour average precipitation rate. The files are gdas..t${HH}z.sfluxgrbf003.grib2 and gdas..t${HH}z.sfluxgrbf006.grib2
+in grib2 format. The processing step is below:
+
+(1) download the data from HPSS using script Get_snowDA_from_HPSS.sh in /scratch1/NCEPDEV/da/Youlong.Xia/download_fromHPSS_scripts
+
+(2a) use wgrib2 to extract the 8 variables as described above for the 006 file.
+(2b) use wgrib2 to convert grib2 files into netcdf file
+(2c) use ncks to extract 6-hour average precipitation for use of replacing 3-hour average precipitation in 003 file
+
+(3a) use wgrib2 to extract the 8 variable into a grib2 format for the 003 file
+(3b) use wgrib2 to convert grib2 file into a netcdf file
+(3c) use ncks to extrcat time from the 003 nectcdf file 
+(3d) use ncks to replace 3-hour average precipitation with 6-hour average precipitation
+(3e) use ncks to replace correct time in the final nectdf file for the 003 file and a given time 
+
+(4a) use cdo to marge all nc files into a file for a given YYYYMM. 
+(4b) delete the individual netcdf files for that YYYMM.
+
+(5) Use ncrename to rename traditional variable names. E.g.,
+ncrename  -v TMP_2maboveground,temperature -v SPFH_2maboveground,humidity -v UGRD_10maboveground,uwind -v VGRD_10maboveground,vwind -v PRES_surface,pressure -v PRATE_surface,precipitation -v DSWRF_surface,shortwave_radiation -v  DLWRF_surface,longwave_radiation combine_forcing_202204.nc
+
+(6) mv combine_forcing_202204.nc snow2dvar_frocing_202204.nc 
+
+The processing script is extract_forcing_from_2dvar_grib2.sh in /scratch2/NCEPDEV/land/Youlong.Xia/coupledSnow2dvar_forcing/2dvar
+
+Youlong Xia
+7 April 2025
