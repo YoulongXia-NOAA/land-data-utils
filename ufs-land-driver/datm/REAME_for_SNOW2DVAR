@@ -1,0 +1,11 @@
+a. use ncks to extract elevation data from history directory, e.g.,  gdas.t12z.sfcf006.nc for use of elevation difference calculation in land-data-utils
+
+b. create linear weights from 2dvar grid to C384.mx025 grid
+
+c. modify  regrid_to_vector.ncl and create_vector_elevation.ncl for variable names, directories, etc. for land-data-utils
+
+d. add #SBATCH --mem=50G to create_datm_files_SNOW2DVAR.sh to overcome out of memory issue
+
+Youlong Xia
+
+11 April 2025
